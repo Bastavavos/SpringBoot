@@ -1,12 +1,18 @@
 package com.testwebapp.webapp.web.controller;
 import com.testwebapp.webapp.dao.CustomerDao;
+import com.testwebapp.webapp.exception.PermitException;
 import com.testwebapp.webapp.model.Customer;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
+
 import java.util.List;
 
 @RestController // traite les requetes definies, chaque methode va renvoyer directement la reponse JSON à l'utilisateur
 public class CustomerController {
+
+    RestTemplate restTemplate = new RestTemplate();
+
     private final CustomerDao customerDao;
 
     public CustomerController(CustomerDao customerDao){
@@ -14,38 +20,42 @@ public class CustomerController {
     }
 
     @ApiOperation(value = "Récupère la liste de tous les clients")
-
     @GetMapping("/customer")
     public List<Customer> listCustomer() {
         return customerDao.findAll();
     }
 
     @ApiOperation(value = "Récupère un client par son id")
-
     @GetMapping(value = "/customer/{id}")
     public Customer showCustomer(@PathVariable int id) {
         return customerDao.findById(id);
     }
 
     @ApiOperation(value = "Ajouter un client")
-
     @PostMapping(value = "/customer")
     public void addCustomer(@RequestBody Customer customer) {
+        validPermit(customer.getPermitnumber());
         customerDao.save(customer);
     }
 
     @ApiOperation(value = "Modifier un client")
-
     @PutMapping(value = "/customer/{id}")
     public void updateCustom (@PathVariable int id, @RequestBody Customer customer) {
+        validPermit(customer.getPermitnumber());
         customerDao.updateCustomer(id, customer);
     }
 
     @ApiOperation(value = "Supprimer un client")
-
     @DeleteMapping(value = "/customer/{id}")
     public void deleteCustom (@PathVariable int id) {
         customerDao.deleteCustomer(id);
+    }
+
+    public void validPermit (String permitnumber){
+        Boolean isValid = restTemplate.getForObject("http://localhost:8081/licenses/" + permitnumber, Boolean.class);
+        if (isValid == null || !isValid) {
+            throw new PermitException();
+        }
     }
 }
 

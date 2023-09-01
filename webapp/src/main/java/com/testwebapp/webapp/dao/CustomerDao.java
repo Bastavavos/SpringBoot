@@ -1,5 +1,6 @@
 package com.testwebapp.webapp.dao;
 
+import com.testwebapp.webapp.exception.PermitException;
 import com.testwebapp.webapp.model.Customer;
 
 import java.util.List;
