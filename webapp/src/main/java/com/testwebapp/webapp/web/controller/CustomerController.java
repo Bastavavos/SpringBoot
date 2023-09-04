@@ -1,30 +1,44 @@
 package com.testwebapp.webapp.web.controller;
+import com.fasterxml.jackson.databind.ser.FilterProvider;
+import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
+import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 import com.testwebapp.webapp.dao.CustomerDao;
 import com.testwebapp.webapp.exception.PermitException;
 import com.testwebapp.webapp.model.Customer;
+//import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiOperation;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.converter.json.MappingJacksonValue;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
+//import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
 
 @RestController // traite les requetes definies, chaque methode va renvoyer directement la reponse JSON à l'utilisateur
 public class CustomerController {
 
-    RestTemplate restTemplate = new RestTemplate();
+    @Autowired
 
-    private final CustomerDao customerDao;
+//    RestTemplate restTemplate = new RestTemplate();
 
-    public CustomerController(CustomerDao customerDao){
-        this.customerDao = customerDao;
-    }
+    private CustomerDao customerDao;
 
-    @ApiOperation(value = "Récupère la liste de tous les clients")
-    @GetMapping("/customer")
-    public List<Customer> listCustomer() {
+//    public CustomerController(CustomerDao customerDao){
+//        this.customerDao = customerDao;
+//    }
+    @RequestMapping(value = "/customers", method = RequestMethod.GET)
+
+    public List<Customer> listCustomers() {
         return customerDao.findAll();
     }
 
+//    @ApiOperation(value = "Récupère la liste de tous les clients")
+//    @GetMapping("/customer")
+//    public List<Customer> listCustomer() {
+//        return customerDao.findAll();
+//    }
+//
     @ApiOperation(value = "Récupère un client par son id")
     @GetMapping(value = "/customer/{id}")
     public Customer showCustomer(@PathVariable int id) {
@@ -34,29 +48,30 @@ public class CustomerController {
     @ApiOperation(value = "Ajouter un client")
     @PostMapping(value = "/customer")
     public void addCustomer(@RequestBody Customer customer) {
-        validPermit(customer.getPermitnumber());
         customerDao.save(customer);
     }
+//
+//    @ApiOperation(value = "Modifier un client")
+//    @PutMapping(value = "/customer/{id}")
+//    public void updateCustom (@PathVariable int id, @RequestBody Customer customer) {
+//        validPermit(customer.getPermitnumber());
+//        customerDao.updateCustomer(id, customer);
+//    }
+//
+//    @ApiOperation(value = "Supprimer un client")
+//    @DeleteMapping(value = "/customer/{id}")
+//    public void deleteCustom (@PathVariable int id) {
+//        customerDao.deleteCustomer(id);
+//    }
 
-    @ApiOperation(value = "Modifier un client")
-    @PutMapping(value = "/customer/{id}")
-    public void updateCustom (@PathVariable int id, @RequestBody Customer customer) {
-        validPermit(customer.getPermitnumber());
-        customerDao.updateCustomer(id, customer);
-    }
+//    public void validPermit (String permitnumber){
+//        Boolean isValid = restTemplate.getForObject("http://localhost:8081/licenses/" + permitnumber, Boolean.class);
+//        if (isValid == null || !isValid) {
+//            throw new PermitException();
+//        }
+//    }
 
-    @ApiOperation(value = "Supprimer un client")
-    @DeleteMapping(value = "/customer/{id}")
-    public void deleteCustom (@PathVariable int id) {
-        customerDao.deleteCustomer(id);
-    }
 
-    public void validPermit (String permitnumber){
-        Boolean isValid = restTemplate.getForObject("http://localhost:8081/licenses/" + permitnumber, Boolean.class);
-        if (isValid == null || !isValid) {
-            throw new PermitException();
-        }
-    }
 }
 
 

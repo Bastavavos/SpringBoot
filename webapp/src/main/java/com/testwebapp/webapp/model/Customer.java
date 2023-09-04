@@ -1,8 +1,16 @@
 package com.testwebapp.webapp.model;
 
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 import java.util.Date;
+import javax.persistence.Entity;
 
+//@JsonFilter("monFiltreDynamique")
+@Entity
 public class Customer {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     private String name;
     private String firstname;
@@ -16,6 +24,9 @@ public class Customer {
         this.firstname = firstname;
         this.dateofbirth = dateofbirth;
         this.permitnumber = permitnumber;
+    }
+
+    public Customer() {
     }
 
     public int getId() {
